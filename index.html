@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Aevum Monolith | Logic Singularity Debugger</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -11,17 +11,21 @@
     <div class="bg-noise"></div>
     <div class="bg-grid"></div>
 
-    <div id="dropzone" class="canvas-entry">
+    <div id="dropzone" class="canvas-entry" onclick="document.getElementById('fileInput').click()">
         <div class="aevum-logo-container">
             <div class="aevum-logo"></div>
             <p class="drop-text">READY FOR LOGIC INJECTION</p>
+            <p class="mobile-hint">(TAP OR DROP FILE)</p>
         </div>
+        <input type="file" id="fileInput" hidden onchange="handleFileSelect(this)">
     </div>
 
     <main id="dashboard" class="dashboard-hidden">
         <section class="panel preview-panel">
             <span class="label">PREVIEW</span>
-            <div id="preview-content" class="content-area"></div>
+            <div id="preview-content" class="content-area">
+                <div class="placeholder-art">SYSTEM_ACTIVE</div>
+            </div>
         </section>
 
         <section class="panel log-panel">
