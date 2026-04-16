@@ -3,36 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aevum LSD | Logic Singularity Debugger</title>
+    <title>Aevum Monolith | Logic Singularity Debugger</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
+    <div class="bg-noise"></div>
+    <div class="bg-grid"></div>
+
     <div id="dropzone" class="canvas-entry">
         <div class="aevum-logo-container">
             <div class="aevum-logo"></div>
-            <p class="drop-text">DROP YOUR LOGIC HERE</p>
+            <p class="drop-text">READY FOR LOGIC INJECTION</p>
         </div>
-        <input type="file" id="fileInput" hidden>
     </div>
 
     <main id="dashboard" class="dashboard-hidden">
         <section class="panel preview-panel">
             <span class="label">PREVIEW</span>
-            <div id="preview-content" class="content-area">
-                </div>
+            <div id="preview-content" class="content-area"></div>
         </section>
 
         <section class="panel log-panel">
             <span class="label">LOG</span>
-            <div id="log-waterfall" class="content-area waterfall">
-                </div>
+            <div id="log-waterfall" class="content-area waterfall"></div>
         </section>
 
         <section class="panel var-panel">
             <span class="label">VARIABLES</span>
-            <div id="var-matrix" class="content-area">
-                </div>
+            <div id="var-matrix" class="content-area var-grid"></div>
         </section>
 
         <footer class="panel timeline-panel">
@@ -40,7 +39,7 @@
             <div class="timeline-container">
                 <div id="timeline-track" class="track">
                     <div id="timeline-thumb" class="thumb"></div>
-                    </div>
+                </div>
             </div>
         </footer>
     </main>
