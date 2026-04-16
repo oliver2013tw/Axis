@@ -1,10 +1,11 @@
 :root {
-    --bg-color: #0a0a0a;
-    --glass-bg: rgba(255, 255, 255, 0.05);
-    --border-color: rgba(255, 255, 255, 0.1);
-    --accent-blue: #60a5fa;
-    --error-red: #ef4444;
-    --text-main: #e5e7eb;
+    --bg-color: #050505;
+    --glass-bg: rgba(15, 15, 15, 0.7);
+    --border-color: rgba(255, 255, 255, 0.08);
+    --accent-blue: #3b82f6;
+    --error-red: #ff3e3e;
+    --text-main: #d1d5db;
+    --grid-color: rgba(255, 255, 255, 0.02);
 }
 
 * {
@@ -12,6 +13,7 @@
     margin: 0;
     padding: 0;
     font-family: 'JetBrains Mono', monospace;
+    -webkit-font-smoothing: antialiased; /* 優化字體渲染 */
 }
 
 body {
@@ -21,122 +23,108 @@ body {
     overflow: hidden;
 }
 
-/* 1.A 矩陣展開動畫 */
+/* 背景網格與雜訊 */
+.bg-grid {
+    position: fixed;
+    inset: 0;
+    background-image: linear-gradient(var(--grid-color) 1px, transparent 1px),
+                      linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+    background-size: 40px 40px;
+    z-index: -1;
+}
+
+.bg-noise {
+    position: fixed;
+    inset: 0;
+    background: url('https://grainy-gradients.vercel.app/noise.svg');
+    opacity: 0.03;
+    z-index: -1;
+    pointer-events: none;
+}
+
+/* 90度直角滾動條優化 */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 0; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent-blue); }
+
+/* 矩陣展開與呼吸動畫 */
 @keyframes matrixDeploy {
-    0% { opacity: 0; transform: scale(0.95); filter: blur(10px); }
+    0% { opacity: 0; transform: scale(0.98); filter: blur(20px); }
     100% { opacity: 1; transform: scale(1); filter: blur(0); }
 }
 
-/* Aevum Logo 呼吸感 (3.A) */
 @keyframes breathing {
-    0%, 100% { opacity: 0.3; filter: drop-shadow(0 0 2px var(--accent-blue)); }
-    50% { opacity: 1; filter: drop-shadow(0 0 10px var(--accent-blue)); }
+    0%, 100% { opacity: 0.2; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.05); }
 }
 
-/* 畫布入口樣式 */
-.canvas-entry {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    transition: opacity 0.5s ease;
+@keyframes varFlash {
+    0% { color: var(--accent-blue); }
+    100% { color: var(--text-main); }
 }
 
-.aevum-logo {
-    width: 80px;
-    height: 80px;
-    border: 2px solid var(--text-main);
-    margin: 0 auto 20px;
-    animation: breathing 4s infinite ease-in-out;
-}
-
-.drop-text {
-    letter-spacing: 4px;
-    font-size: 0.8rem;
-    opacity: 0.6;
-}
-
-/* Monolith 排版結構 (L型非對稱) */
-#dashboard {
-    display: grid;
-    grid-template-columns: 65% 35%;
-    grid-template-rows: 70% 30% 60px;
-    gap: 8px; /* 區塊縫隙 */
-    padding: 8px;
-    height: 100vh;
-    animation: matrixDeploy 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+/* 區塊樣式 */
+.panel {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border-color);
+    position: relative;
+    animation: matrixDeploy 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .dashboard-hidden { display: none !important; }
 
-/* 磨砂玻璃區塊 */
-.panel {
-    background: var(--glass-bg);
-    backdrop-filter: blur(15px);
-    border: 1px solid var(--border-color);
-    position: relative;
-    overflow: hidden;
+#dashboard {
+    display: grid;
+    grid-template-columns: 65% 35%;
+    grid-template-rows: 68% 32% 60px;
+    gap: 8px;
+    padding: 10px;
+    height: 100vh;
 }
 
-/* 內嵌式標籤 (1.A) */
 .label {
     position: absolute;
-    top: 10px;
-    left: 10px;
+    top: 12px;
+    left: 12px;
     font-size: 10px;
-    letter-spacing: 2px;
-    opacity: 0.4;
-    z-index: 10;
+    letter-spacing: 3px;
+    opacity: 0.3;
+    pointer-events: none;
 }
 
-/* 區塊定位 */
-.preview-panel { grid-row: 1 / 3; grid-column: 1; }
-.log-panel { grid-row: 1; grid-column: 2; }
-.var-panel { grid-row: 2; grid-column: 2; }
-.timeline-panel { grid-row: 3; grid-column: 1 / 3; }
-
-/* 瀑布流日誌 (2.B) */
+/* 內容區塊 */
 .waterfall {
-    padding: 30px 15px 15px;
-    font-size: 12px;
-    line-height: 1.6;
+    padding: 40px 20px 20px;
     overflow-y: auto;
     height: 100%;
 }
 
-.log-entry { margin-bottom: 4px; border-left: 2px solid var(--accent-blue); padding-left: 8px; }
-.log-error { border-left-color: var(--error-red); color: var(--error-red); }
-
-/* 錯誤時的邊框紅光 (局部警告) */
-.panel-error { border: 1px solid var(--error-red) !important; box-shadow: inset 0 0 10px rgba(239, 68, 68, 0.2); }
-
-/* 時間條樣式 */
-.timeline-container {
-    padding: 20px 40px;
-    height: 100%;
+.log-entry { 
+    font-size: 12px; 
+    margin-bottom: 6px; 
+    border-left: 1px solid var(--accent-blue); 
+    padding-left: 12px;
+    opacity: 0.8;
 }
 
-.track {
-    height: 2px;
-    background: rgba(255, 255, 255, 0.1);
-    position: relative;
-    width: 100%;
+.log-error { border-left-color: var(--error-red); color: var(--error-red); opacity: 1; }
+.panel-error { border-color: var(--error-red) !important; }
+
+/* 變數矩陣 */
+.var-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 15px;
+    padding: 40px 20px 20px;
 }
 
-.thumb {
-    width: 4px;
-    height: 16px;
-    background: var(--text-main);
-    position: absolute;
-    top: -7px;
-    cursor: ew-resize;
-}
+.var-item { font-size: 11px; }
+.var-value { font-weight: bold; transition: color 0.3s; }
+.var-changing { animation: varFlash 0.5s ease; }
 
-.error-mark {
-    position: absolute;
-    width: 2px;
-    height: 10px;
-    background: var(--error-red);
-    top: -4px;
-    box-shadow: 0 0 5px var(--error-red);
-}
+/* 時間軸 */
+.timeline-panel { grid-column: 1 / 3; }
+.track { height: 1px; background: rgba(255, 255, 255, 0.05); position: relative; width: 100%; margin-top: 25px; }
+.thumb { width: 2px; height: 12px; background: var(--accent-blue); position: absolute; top: -6px; }
