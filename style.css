@@ -1,0 +1,142 @@
+:root {
+    --bg-color: #0a0a0a;
+    --glass-bg: rgba(255, 255, 255, 0.05);
+    --border-color: rgba(255, 255, 255, 0.1);
+    --accent-blue: #60a5fa;
+    --error-red: #ef4444;
+    --text-main: #e5e7eb;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* 1.A 矩陣展開動畫 */
+@keyframes matrixDeploy {
+    0% { opacity: 0; transform: scale(0.95); filter: blur(10px); }
+    100% { opacity: 1; transform: scale(1); filter: blur(0); }
+}
+
+/* Aevum Logo 呼吸感 (3.A) */
+@keyframes breathing {
+    0%, 100% { opacity: 0.3; filter: drop-shadow(0 0 2px var(--accent-blue)); }
+    50% { opacity: 1; filter: drop-shadow(0 0 10px var(--accent-blue)); }
+}
+
+/* 畫布入口樣式 */
+.canvas-entry {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    transition: opacity 0.5s ease;
+}
+
+.aevum-logo {
+    width: 80px;
+    height: 80px;
+    border: 2px solid var(--text-main);
+    margin: 0 auto 20px;
+    animation: breathing 4s infinite ease-in-out;
+}
+
+.drop-text {
+    letter-spacing: 4px;
+    font-size: 0.8rem;
+    opacity: 0.6;
+}
+
+/* Monolith 排版結構 (L型非對稱) */
+#dashboard {
+    display: grid;
+    grid-template-columns: 65% 35%;
+    grid-template-rows: 70% 30% 60px;
+    gap: 8px; /* 區塊縫隙 */
+    padding: 8px;
+    height: 100vh;
+    animation: matrixDeploy 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dashboard-hidden { display: none !important; }
+
+/* 磨砂玻璃區塊 */
+.panel {
+    background: var(--glass-bg);
+    backdrop-filter: blur(15px);
+    border: 1px solid var(--border-color);
+    position: relative;
+    overflow: hidden;
+}
+
+/* 內嵌式標籤 (1.A) */
+.label {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-size: 10px;
+    letter-spacing: 2px;
+    opacity: 0.4;
+    z-index: 10;
+}
+
+/* 區塊定位 */
+.preview-panel { grid-row: 1 / 3; grid-column: 1; }
+.log-panel { grid-row: 1; grid-column: 2; }
+.var-panel { grid-row: 2; grid-column: 2; }
+.timeline-panel { grid-row: 3; grid-column: 1 / 3; }
+
+/* 瀑布流日誌 (2.B) */
+.waterfall {
+    padding: 30px 15px 15px;
+    font-size: 12px;
+    line-height: 1.6;
+    overflow-y: auto;
+    height: 100%;
+}
+
+.log-entry { margin-bottom: 4px; border-left: 2px solid var(--accent-blue); padding-left: 8px; }
+.log-error { border-left-color: var(--error-red); color: var(--error-red); }
+
+/* 錯誤時的邊框紅光 (局部警告) */
+.panel-error { border: 1px solid var(--error-red) !important; box-shadow: inset 0 0 10px rgba(239, 68, 68, 0.2); }
+
+/* 時間條樣式 */
+.timeline-container {
+    padding: 20px 40px;
+    height: 100%;
+}
+
+.track {
+    height: 2px;
+    background: rgba(255, 255, 255, 0.1);
+    position: relative;
+    width: 100%;
+}
+
+.thumb {
+    width: 4px;
+    height: 16px;
+    background: var(--text-main);
+    position: absolute;
+    top: -7px;
+    cursor: ew-resize;
+}
+
+.error-mark {
+    position: absolute;
+    width: 2px;
+    height: 10px;
+    background: var(--error-red);
+    top: -4px;
+    box-shadow: 0 0 5px var(--error-red);
+}
