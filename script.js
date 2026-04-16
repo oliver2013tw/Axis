@@ -2,100 +2,96 @@ const dropzone = document.getElementById('dropzone');
 const dashboard = document.getElementById('dashboard');
 const logWaterfall = document.getElementById('log-waterfall');
 const varMatrix = document.getElementById('var-matrix');
-const timelineTrack = document.getElementById('timeline-track');
 
-const MAX_LOG_ENTRIES = 500; // 防止內存洩漏
-const ALLOWED_EXTENSIONS = ['.py', '.js', '.json', '.txt', '.cpp'];
+// 檔案驗證
+const ALLOWED_EXT = ['.py', '.js', '.txt', '.json', '.cpp', '.html', '.css'];
 
-// 拖放交互
+function validateFile(name) {
+    return ALLOWED_EXT.some(ext => name.toLowerCase().endsWith(ext));
+}
+
+// 處理選擇檔案 (手機 & 點擊)
+function handleFileSelect(input) {
+    const file = input.files[0];
+    if (file) {
+        processFile(file.name);
+    }
+}
+
+// 處理拖放
 dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.style.opacity = '0.5'; });
 dropzone.addEventListener('dragleave', () => { dropzone.style.opacity = '1'; });
 dropzone.addEventListener('drop', (e) => {
     e.preventDefault();
     const file = e.dataTransfer.files[0];
-    if (file && validateFile(file.name)) {
-        initiateSystem(file.name);
-    } else {
-        alert("INVALID LOGIC TYPE. SYSTEM REJECTED.");
-        dropzone.style.opacity = '1';
-    }
+    if (file) processFile(file.name);
 });
 
-function validateFile(name) {
-    return ALLOWED_EXTENSIONS.some(ext => name.toLowerCase().endsWith(ext));
-}
-
-function initiateSystem(fileName) {
-    dropzone.style.display = 'none';
-    dashboard.classList.remove('dashboard-hidden');
-    
-    // 重置介面
-    logWaterfall.innerHTML = '';
-    varMatrix.innerHTML = '';
-    
-    pushLog(`MONOLITH SYSTEM ACTIVE: MOUNTING ${fileName.toUpperCase()}`, false);
-    
-    // 啟動虛擬執行
-    startSimulation();
-}
-
-function pushLog(msg, isErr = false) {
-    if (logWaterfall.children.length > MAX_LOG_ENTRIES) {
-        logWaterfall.removeChild(logWaterfall.firstChild);
+// 啟動系統
+function processFile(name) {
+    if (!validateFile(name)) {
+        alert("UNSUPPORTED LOGIC UNIT.");
+        return;
     }
 
-    const div = document.createElement('div');
-    div.className = `log-entry ${isErr ? 'log-error' : ''}`;
-    div.innerText = `> ${msg}`;
-    logWaterfall.appendChild(div);
-    logWaterfall.scrollTop = logWaterfall.scrollHeight;
-
-    if (isErr) {
-        document.querySelector('.log-panel').classList.add('panel-error');
-        createTimelineMark();
-    }
-}
-
-function updateVar(name, value) {
-    let el = document.getElementById(`var-${name}`);
-    if (!el) {
-        el = document.createElement('div');
-        el.id = `var-${name}`;
-        el.className = 'var-item';
-        varMatrix.appendChild(el);
-    }
-    el.innerHTML = `<span style="opacity:0.5">${name}:</span> <span class="var-value var-changing">${value}</span>`;
-    
-    // 移除閃爍動畫以便下次觸發
+    dropzone.style.opacity = '0';
     setTimeout(() => {
-        el.querySelector('.var-value').classList.remove('var-changing');
+        dropzone.style.display = 'none';
+        dashboard.classList.remove('dashboard-hidden');
+        runAevumSimulation(name);
     }, 500);
 }
 
-function createTimelineMark() {
-    const mark = document.createElement('div');
-    mark.className = 'error-mark'; // CSS中定義的紅線
-    mark.style.position = 'absolute';
-    mark.style.left = (Math.random() * 100) + '%';
-    mark.style.width = '1px';
-    mark.style.height = '10px';
-    mark.style.background = '#ff3e3e';
-    mark.style.top = '-5px';
-    timelineTrack.appendChild(mark);
+// 模擬 Debug 數據流
+function runAevumSimulation(fileName) {
+    addLog(`SYSTEM_MOUNT: ${fileName.toUpperCase()}`, false);
+    addLog("KERNEL_ESTABLISHED. INITIATING TRACKING...", false);
+
+    const mockLogs = [
+        "FETCHING MEMORY ADDR: 0x004F32",
+        "LOGIC_GATE_STATUS: STABLE",
+        "SYNCING WITH AEVUM_LSD_CLOUD",
+        "ERROR: DATA_CORRUPTION_DETECTION",
+        "HEXAVAULT_DECRYPT_ACTIVE",
+        "RETRYING_CONNECTION..."
+    ];
+
+    setInterval(() => {
+        const isError = Math.random() > 0.85;
+        const msg = mockLogs[Math.floor(Math.random() * mockLogs.size)]; // 修復小錯誤
+        addLog(isError ? `CRITICAL: ${mockLogs[3]}` : `EXEC: ${mockLogs[Math.floor(Math.random()*mockLogs.length)]}`, isError);
+        
+        updateVariable("entropy", (Math.random() * 10).toFixed(4));
+        updateVariable("status", isError ? "HALT" : "RUNNING");
+        
+        // 移動時間軸滑塊
+        const thumb = document.getElementById('timeline-thumb');
+        let currentPos = parseFloat(thumb.style.left) || 0;
+        thumb.style.left = ((currentPos + 1) % 100) + '%';
+    }, 1200);
 }
 
-// 模擬運算
-function startSimulation() {
-    let count = 0;
-    const mockData = ["PROCESS_START", "AUTH_SYNCING", "ENCRYPT_AES_256", "BUFFER_OVERFLOW_PREVENTION", "TRACE_COMPLETE"];
-    
-    setInterval(() => {
-        const msg = mockData[Math.floor(Math.random() * mockData.length)];
-        const isErr = Math.random() > 0.85;
-        pushLog(isErr ? `CRITICAL_EXCEPTION_IN_${msg}` : `STATUS_OK: ${msg}`, isErr);
-        
-        updateVar("sys_entropy", (Math.random() * 100).toFixed(2));
-        updateVar("logic_state", isErr ? "HALT" : "EXEC");
-        count++;
-    }, 1000);
+function addLog(msg, isError) {
+    const entry = document.createElement('div');
+    entry.className = `log-entry ${isError ? 'log-error' : ''}`;
+    entry.innerText = `> ${msg}`;
+    logWaterfall.appendChild(entry);
+    logWaterfall.scrollTop = logWaterfall.scrollHeight;
+
+    if (isError) {
+        const panel = document.querySelector('.log-panel');
+        panel.style.borderColor = '#ff3e3e';
+        setTimeout(() => panel.style.borderColor = 'rgba(255,255,255,0.1)', 200);
+    }
+}
+
+function updateVariable(key, val) {
+    let el = document.getElementById(`var-${key}`);
+    if (!el) {
+        el = document.createElement('div');
+        el.id = `var-${key}`;
+        el.className = 'var-item';
+        varMatrix.appendChild(el);
+    }
+    el.innerHTML = `<span style="opacity:0.4">${key.toUpperCase()}</span><br>${val}`;
 }
